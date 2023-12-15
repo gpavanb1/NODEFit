@@ -32,11 +32,14 @@ class NeuralODE:
             sol = solve_ivp(fun=lambda t, x: self.predict(t, x).detach().numpy(),
                             t_span=self.ode_problem.t_span,
                             y0=self.ode_problem.u_0, t_eval=self.ode_t)
-        if sol.status == 0:
-            _, self.nn_data = sol.t, sol.y
-            return self.ode_t, self.nn_data
+            if sol.status == 0:
+                _, self.nn_data = sol.t, sol.y
+                return self.ode_t, self.nn_data
+            else:
+                raise Exception('Neural Network ODE Solver failed to converge')
+
         else:
-            raise Exception('Neural Network ODE Solver failed to converge')
+            return self.ode_t, self.nn_data
 
     def loss(self):
         if self.ode_data is None:
