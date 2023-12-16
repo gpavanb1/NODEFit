@@ -22,6 +22,19 @@ class NeuralODE:
             [torch.tensor([t]), torch.tensor(x)], dim=0)
         return self.neural_net(combined)
 
+    def load_ode_data(self, t_arr, data_arr):
+        ndim = self.ode_problem.u_0.shape[0]
+        nsteps = len(self.ode_problem.t_steps)
+
+        if t_arr.shape != (nsteps, ):
+            raise Exception('Time array not in correct shape')
+
+        if data_arr.shape != (ndim, nsteps):
+            raise Exception('Data array not in correct shape')
+
+        self.ode_t = t_arr
+        self.ode_data = data_arr
+
     def ode_solve(self):
         if self.ode_data is None:
             self.ode_t, self.ode_data = self.ode_problem.solve()
