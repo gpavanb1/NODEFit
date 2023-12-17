@@ -53,7 +53,7 @@ class NeuralODE:
             torch.Tensor: The predicted next state.
         """
         combined = torch.cat(
-            [torch.tensor([t]), y.clone()], dim=0).to(DEVICE)
+            [torch.tensor([t]).to(DEVICE), y.clone().to(DEVICE)], dim=0).to(DEVICE)
         return self.neural_net(combined)
 
     def loss(self):
