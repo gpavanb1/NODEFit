@@ -3,14 +3,14 @@ from setuptools import setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setup(name='FContin',
+setup(name='NODEFit',
       version='0.1',
-      description='Bayesian (Physics-Informed) Neural Differential Equations in Python',
-      url='https://github.com/gpavanb1/BPNets',
+      description='Fit time-series data with a Neural Differential Equation',
+      url='https://github.com/gpavanb1/NODEFit',
       author='gpavanb1',
       author_email='gpavanb@gmail.com',
       license='MIT',
-      packages=['bpnets'],
+      packages=['nodefit'],
       install_requires=["numpy",
                         ],
       long_description=long_description,
@@ -23,9 +23,9 @@ setup(name='FContin',
           'Programming Language :: Python :: 3.7',
           'Programming Language :: Python :: 3 :: Only',
       ],
-      keywords='python bayesian numerical ML',
+      keywords='python neural-network pytorch numerical-methods neural-ode',
       project_urls={  # Optional
-          'Bug Reports': 'https://github.com/gpavanb1/BPNets/issues',
-          'Source': 'https://github.com/gpavanb1/BPNets/',
+          'Bug Reports': 'https://github.com/gpavanb1/NODEFit/issues',
+          'Source': 'https://github.com/gpavanb1/NODEFit/',
       },
       zip_safe=False)
