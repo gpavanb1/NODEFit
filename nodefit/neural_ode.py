@@ -4,12 +4,30 @@ import torch.optim as optim
 from torchdiffeq import odeint
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.integrate import solve_ivp
 from tqdm import tqdm
 
 
 class NeuralODE:
     def __init__(self, neural_net: nn.Module, t, data):
+        """
+        A class representing a neural ordinary differential equation (Neural ODE) model to fit time-series data.
+
+        Args:
+            neural_net (nn.Module): The neural network model.
+            t (array-like): Time values for the data.
+            data (array-like): Observed data to be fitted by the Neural ODE.
+
+        Attributes:
+            neural_net (nn.Module): The neural network model.
+            t (torch.Tensor): Time values for the data.
+            data (torch.Tensor): Observed data to be fitted by the Neural ODE.
+            nn_data (torch.Tensor): Neural network-generated data after fitting.
+            optimizer (torch.optim.Optimizer): The optimizer used for training the neural network.
+            y0 (torch.Tensor): Initial state for solving the ODE.
+
+        Note:
+            This class assumes that the provided neural network (`neural_net`) has a compatible architecture.
+        """
         self.neural_net = neural_net
         self.t = torch.tensor(t).double()
         self.data = torch.tensor(data).double()
@@ -23,11 +41,27 @@ class NeuralODE:
         self.y0 = self.data[0].clone()
 
     def predict(self, t, y):
+        """
+        Predicts the next state using the neural network.
+
+        Args:
+            t (float): The current time.
+            y (torch.Tensor): The current state.
+
+        Returns:
+            torch.Tensor: The predicted next state.
+        """
         combined = torch.cat(
             [torch.tensor([t]), y.clone()], dim=0)
         return self.neural_net(combined)
 
     def loss(self):
+        """
+        Computes the mean squared error loss between observed and predicted data.
+
+        Returns:
+            torch.Tensor: The loss value.
+        """
         if self.data is None:
             raise Exception('Solve the ODE before training')
 
@@ -39,6 +73,16 @@ class NeuralODE:
         return loss_tensor
 
     def train(self, num_epochs, print_every=100):
+        """
+        Trains the neural network to fit the observed data.
+
+        Args:
+            num_epochs (int): The number of training epochs.
+            print_every (int): Print loss every `print_every` epochs.
+
+        Returns:
+            None
+        """
         for i in tqdm(range(num_epochs)):
             self.optimizer.zero_grad()
             self.loss().backward()
@@ -49,12 +93,31 @@ class NeuralODE:
                 print(f'Epoch {i}/{num_epochs}, Loss: {self.loss().item()}')
 
     def extrapolate(self, tf, npts=20):
+        """
+        Extrapolates the solution of the Neural ODE to future time points.
+
+        Args:
+            tf (float): The final time for extrapolation.
+            npts (int): Number of points for extrapolation.
+
+        Returns:
+            dict: Dictionary containing extrapolated times and corresponding values.
+        """
         tspan = np.linspace(self.t[-1], tf, npts)
         result = odeint(
             self.predict, self.nn_data[-1].clone(), torch.tensor(tspan))
         return {"time": tspan, "values": result}
 
     def plot(self, extra_data=None):
+        """
+        Plots the observed data, Neural Network solution, and extrapolated data (if provided).
+
+        Args:
+            extra_data (dict): Dictionary containing extrapolated time values and corresponding values.
+
+        Returns:
+            None
+        """
         if self.data is None:
             raise Exception('Load data before plotting')
         if self.nn_data is None:
