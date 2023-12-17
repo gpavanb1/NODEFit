@@ -113,7 +113,7 @@ class NeuralODE:
         Plots the observed data, Neural Network solution, and extrapolated data (if provided).
 
         Args:
-            extra_data (dict): Dictionary containing extrapolated time values and corresponding values.
+            extra_data (dict): Dictionary containing extrapolated time and corresponding values.
 
         Returns:
             None
