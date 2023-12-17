@@ -134,7 +134,7 @@ class NeuralSDE:
         Returns:
             dict: Extrapolated time and values.
         """
-        tspan = np.linspace(self.t[-1], tf, npts)
+        tspan = np.linspace(self.t[-1].cpu().item(), tf, npts)
         result = sdeint(
             self.sde, self.nn_data[-1].clone().to(
                 DEVICE), torch.tensor(tspan).to(DEVICE),
