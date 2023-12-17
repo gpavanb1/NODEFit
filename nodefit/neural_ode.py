@@ -63,7 +63,7 @@ class NeuralODE:
             torch.Tensor: The loss value.
         """
         if self.data is None:
-            raise Exception('Solve the ODE before training')
+            raise Exception('Load the data before training')
 
         criterion = nn.MSELoss()
 
