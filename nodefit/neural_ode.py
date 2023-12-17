@@ -104,8 +104,10 @@ class NeuralODE:
         Returns:
             dict: Dictionary containing extrapolated times and corresponding values.
         """
+        self.t = self.t.cpu()
         tinit = self.t[-1].item()
         tspan = np.linspace(tinit, tf, npts)
+        self.t = self.t.to(DEVICE)
         result = odeint(
             self.predict, self.nn_data[-1].clone().to(DEVICE), torch.tensor(tspan).to(DEVICE)).to(DEVICE)
         return {"time": tspan, "values": result}
