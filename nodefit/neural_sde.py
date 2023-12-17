@@ -157,11 +157,11 @@ class NeuralSDE:
             raise Exception('Fit neural network before plotting')
 
         # Convert the arrays to numpy arrays for easier plotting
-        t_np = self.t.numpy()
-        data_np = self.data.numpy()
-        nn_data_np = self.nn_data.detach().numpy()
+        t_np = self.t.cpu().numpy()
+        data_np = self.data.cpu().numpy()
+        nn_data_np = self.nn_data.detach().cpu().numpy()
         if extra_data is not None:
-            extra_data_np = extra_data['values'].detach().numpy()
+            extra_data_np = extra_data['values'].detach().cpu().numpy()
 
         # Plot each line separately
         plt.figure(figsize=(10, 6))
