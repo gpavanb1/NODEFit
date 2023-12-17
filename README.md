@@ -1,6 +1,6 @@
 # NODEFit
 
-![Downloads](https://pepy.tech/badge/nodefit)](https://pepy.tech/project/nodefit)
+![Downloads](https://pepy.tech/badge/nodefit)(https://pepy.tech/project/nodefit)
 
 Fit time-series data with a Neural Differential Equation!
 
