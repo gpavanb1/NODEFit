@@ -8,7 +8,7 @@ This repository contains time-series data fit capabilities using both Neural Ord
 
 GPU support is packaged as part of [PyTorch](https://pytorch.org/)
 
-# How to install and execute?
+## How to install and execute?
 
 Tested on Python 3.9
 
