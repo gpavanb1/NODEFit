@@ -5,6 +5,7 @@ from torchsde import sdeint
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
+from .constants import DEVICE
 
 
 class SDE:
@@ -40,7 +41,7 @@ class SDE:
             torch.Tensor: Drift term of the SDE.
         """
         combined = torch.cat(
-            (t * torch.ones((y.shape[0], 1), dtype=y.dtype), y), dim=1)
+            (t * torch.ones((y.shape[0], 1), dtype=y.dtype).to(DEVICE), y), dim=1).to(DEVICE)
         return self.drift_nn(combined)
 
     def g(self, t, y):
@@ -55,7 +56,7 @@ class SDE:
             torch.Tensor: Diffusion term of the SDE.
         """
         combined = torch.cat(
-            (t * torch.ones((y.shape[0], 1), dtype=y.dtype), y), dim=1)
+            (t * torch.ones((y.shape[0], 1), dtype=y.dtype).to(DEVICE), y), dim=1).to(DEVICE)
         return self.diffusion_nn(combined)
 
 
@@ -72,8 +73,8 @@ class NeuralSDE:
             - batch_size (int): Number of trajectories in each batch. Default is 2.
         """
         self.sde = SDE(drift_nn, diffusion_nn)
-        self.t = torch.tensor(t).double()
-        self.data = torch.tensor(data).double()
+        self.t = torch.tensor(t).double().to(DEVICE)
+        self.data = torch.tensor(data).double().to(DEVICE)
         self.nn_data = None
         self.batch_size = batch_size
 
@@ -81,7 +82,7 @@ class NeuralSDE:
         if len(self.t) != nsteps:
             raise Exception('Time array not in correct shape')
 
-        self.y0 = self.data[0].clone().repeat(batch_size, 1)
+        self.y0 = self.data[0].clone().repeat(batch_size, 1).to(DEVICE)
 
     def loss(self):
         """
@@ -96,8 +97,9 @@ class NeuralSDE:
         criterion = nn.MSELoss()
 
         self.nn_data = sdeint(self.sde, self.y0, self.t,
-                              method=self.sde.numerical_method)
-        repeated_data = self.data.unsqueeze(2).repeat(1, 1, self.batch_size)
+                              method=self.sde.numerical_method).to(DEVICE)
+        repeated_data = self.data.unsqueeze(2).repeat(
+            1, 1, self.batch_size).to(DEVICE)
 
         loss_tensor = criterion(repeated_data, self.nn_data)
         return loss_tensor
@@ -134,8 +136,9 @@ class NeuralSDE:
         """
         tspan = np.linspace(self.t[-1], tf, npts)
         result = sdeint(
-            self.sde, self.nn_data[-1].clone(), torch.tensor(tspan),
-            method=self.sde.numerical_method)
+            self.sde, self.nn_data[-1].clone().to(
+                DEVICE), torch.tensor(tspan).to(DEVICE),
+            method=self.sde.numerical_method).to(DEVICE)
         return {"time": tspan, "values": result}
 
     def plot(self, extra_data=None):

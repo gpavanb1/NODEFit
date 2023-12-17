@@ -5,6 +5,7 @@ from torchdiffeq import odeint
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
+from .constants import DEVICE
 
 
 class NeuralODE:
@@ -29,8 +30,8 @@ class NeuralODE:
             This class assumes that the provided neural network (`neural_net`) has a compatible architecture.
         """
         self.neural_net = neural_net
-        self.t = torch.tensor(t).double()
-        self.data = torch.tensor(data).double()
+        self.t = torch.tensor(t).double().to(DEVICE)
+        self.data = torch.tensor(data).double().to(DEVICE)
         self.nn_data = None
         self.optimizer = optim.Adam(self.neural_net.parameters())
 
@@ -38,7 +39,7 @@ class NeuralODE:
         if len(self.t) != nsteps:
             raise Exception('Time array not in correct shape')
 
-        self.y0 = self.data[0].clone()
+        self.y0 = self.data[0].clone().to(DEVICE)
 
     def predict(self, t, y):
         """
@@ -52,7 +53,7 @@ class NeuralODE:
             torch.Tensor: The predicted next state.
         """
         combined = torch.cat(
-            [torch.tensor([t]), y.clone()], dim=0)
+            [torch.tensor([t]), y.clone()], dim=0).to(DEVICE)
         return self.neural_net(combined)
 
     def loss(self):
@@ -67,7 +68,7 @@ class NeuralODE:
 
         criterion = nn.MSELoss()
 
-        self.nn_data = odeint(self.predict, self.y0, self.t)
+        self.nn_data = odeint(self.predict, self.y0, self.t).to(DEVICE)
 
         loss_tensor = criterion(self.data, self.nn_data)
         return loss_tensor
@@ -105,7 +106,7 @@ class NeuralODE:
         """
         tspan = np.linspace(self.t[-1], tf, npts)
         result = odeint(
-            self.predict, self.nn_data[-1].clone(), torch.tensor(tspan))
+            self.predict, self.nn_data[-1].clone().to(DEVICE), torch.tensor(tspan).to(DEVICE)).to(DEVICE)
         return {"time": tspan, "values": result}
 
     def plot(self, extra_data=None):

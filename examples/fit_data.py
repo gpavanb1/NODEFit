@@ -1,12 +1,9 @@
-import torch
 import numpy as np
 import torch.nn as nn
+from nodefit.constants import DEVICE
 from nodefit.neural_ode import NeuralODE
 from nodefit.neural_sde import NeuralSDE
 
-# Use CUDA if available
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print(device)
 
 ###
 # DEFINE NETWORKS
@@ -18,13 +15,13 @@ drift_nn = nn.Sequential(
     nn.Linear(ndim+1, drift_nhidden),
     nn.Sigmoid(),
     nn.Linear(drift_nhidden, ndim)
-).double().to(device)
+).double().to(DEVICE)
 
 diffusion_nn = nn.Sequential(
     nn.Linear(ndim+1, diffusion_nhidden),
     nn.Sigmoid(),
     nn.Linear(diffusion_nhidden, ndim)
-).double().to(device)
+).double().to(DEVICE)
 
 ###
 # PROVIDE DATA
