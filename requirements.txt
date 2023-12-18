@@ -3,4 +3,5 @@ scipy
 torch
 torchdiffeq
 torchsde
+tqdm
 matplotlib
